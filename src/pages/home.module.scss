@@ -1,26 +1,60 @@
-// TODO
 .homeContainer {
-  max-width: 700px;
+  & > div:first-child {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
 
-  .postItem {
-    h1 {
+.postItem {
+  a {
+    font-size: 1.75rem;
+    text-decoration: none;
+    color: var(--white);
+    font-weight: 600;
 
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--pink);
     }
-  
-    p {
-  
-    }
-  
-    time {
-  
-    }
-  
+  }
+
+  p {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--gray-100);
+  }
+
+  time {
+    color: var(--gray-100)
+  }
+
+  > span{
+    margin-left: 1.5rem;
+    color: var(--gray-100);
+  }
+
+  time, span {
     span {
-      
+      margin-left: 0.5rem;
     }
+  }
 
-    & + .postItem {
-      margin-top: 3rem;
-    }
+  & + .postItem {
+    margin-top: 3rem;
+  }
+}
+
+.loadPosts {
+  display: inline-block;
+  margin-top: 4rem;
+  text-decoration: none;
+  color: var(--pink);
+  font-weight: 600;
+
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: brightness(0.9);
   }
 }

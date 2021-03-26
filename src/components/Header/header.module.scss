@@ -1,1 +1,12 @@
 // TODO
+.header {
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  cursor: pointer;
+
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: blur(1px);
+  }
+}
