@@ -1,15 +1,15 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { format } from 'date-fns';
-import enUS from 'date-fns/locale/en-US';
 
 import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 
 import { RichText } from 'prismic-dom';
+import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import Header from '../../components/Header';
+import { prettifyDate } from '../../util/prettifyDate';
 
 interface Post {
   first_publication_date: string | null;
@@ -25,6 +25,23 @@ interface Post {
         text: string;
       }[];
     }[];
+  };
+}
+
+function mapPostContent(response: ApiSearchResponse): Post {
+  return {
+    first_publication_date: prettifyDate(response.first_publication_date),
+    data: {
+      title: response.data.title,
+      banner: response.data.banner.url,
+      author: response.data.author,
+      content: response.data.content.map(section => {
+        return {
+          heading: section.heading,
+          body: RichText.asHtml(section.body),
+        };
+      }),
+    },
   };
 }
 
@@ -93,15 +110,6 @@ export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('post', slug);
 
-  // format date
-  const datePretty = format(
-    new Date(response.first_publication_date),
-    'MMM dd yyyy',
-    {
-      locale: enUS,
-    }
-  );
-
   // get reading time
   const wordCount = response.data?.content.reduce((acc, item) => {
     const sectionWordCount = RichText.asText(item.body).split(' ').length;
@@ -109,20 +117,7 @@ export const getStaticProps: GetStaticProps = async context => {
   }, 0);
   const readingTime = Math.ceil(wordCount / 200);
 
-  const post: Post = {
-    first_publication_date: datePretty,
-    data: {
-      title: response.data.title,
-      banner: response.data.banner.url,
-      author: response.data.author,
-      content: response.data.content.map(section => {
-        return {
-          heading: section.heading,
-          body: RichText.asHtml(section.body),
-        };
-      }),
-    },
-  };
+  const post = mapPostContent(response);
 
   console.log(post);
 
