@@ -1,5 +1,5 @@
 :root {
-  --white: #F8F8F8;
+  --gray-50: #F8F8F8;
 
   --gray-100: #D7D7D7;
   --gray-300: #BBBBBB;
@@ -14,14 +14,25 @@
   padding: 0;
 
   font-family: Inter, sans-serif;
-  font-weight: 400;
 }
 
 // TODO
 body {
   background: var(--gray-800);
+  color: var(--gray-100);
+  font-weight: 400;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700!important;
+  color: var(--gray-50);
+}
+
+a {
+  color: var(--pink);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

@@ -2,6 +2,8 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 import { format } from 'date-fns';
 import enUS from 'date-fns/locale/en-US';
 
+import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
+
 import { RichText } from 'prismic-dom';
 import { getPrismicClient } from '../../services/prismic';
 
@@ -47,19 +49,27 @@ export default function Post({ post, readingTime }: PostProps) {
 
       <div className={`${commonStyles.container} ${styles.postHeading}`}>
         <h1>{post?.data.title}</h1>
-        <span>{post?.first_publication_date}</span>
-        <span>{post?.data.author}</span>
-        <span>{readingTime}</span>
+        <div className={styles.postHeadingInfo}>
+          <div>
+            <FiCalendar />
+            <span>{post?.first_publication_date}</span>
+          </div>
+          <div>
+            <FiUser />
+            <span>{post?.data.author}</span>
+          </div>
+          <div>
+            <FiClock />
+            <span>{`${readingTime} min`}</span>
+          </div>
+        </div>
       </div>
 
       <main className={`${commonStyles.container} ${commonStyles.bottomSpace}`}>
         {post?.data.content.map(content => (
-          <div key={Math.random().toString()}>
+          <div key={Math.random().toString()} className={styles.postBody}>
             <h2>{content.heading}</h2>
-            <div
-              className={styles.postBody}
-              dangerouslySetInnerHTML={{ __html: content.body }}
-            />
+            <div dangerouslySetInnerHTML={{ __html: content.body }} />
           </div>
         ))}
       </main>

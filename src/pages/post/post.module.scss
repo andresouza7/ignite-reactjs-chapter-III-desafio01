@@ -11,11 +11,34 @@
 }
 
 .postHeading {
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .postHeadingInfo {
+    display: flex;
 
+    div {
+      display: flex;
+      align-items: center;
+      margin-right: 1.5rem;
+  
+      span {
+        margin-left: 0.5rem;
+      }
+    }
+  }
 }
 
 .postBody {
-  p {
-    word-break: break-all;
+  h2 {
+    margin-top: 4rem;
+    margin-bottom: 2rem;
   }
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.5rem;
+  }
+
+  
 }
