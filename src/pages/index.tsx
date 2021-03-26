@@ -92,7 +92,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             href="/#"
             onClick={handleLoadMorePosts}
           >
-            Load more posts
+            Carregar mais posts
           </a>
         )}
       </div>

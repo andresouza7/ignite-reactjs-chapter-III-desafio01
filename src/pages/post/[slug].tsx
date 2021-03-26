@@ -4,6 +4,7 @@ import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 
 import { RichText } from 'prismic-dom';
 import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
+import { useRouter } from 'next/router';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -55,6 +56,12 @@ export default function Post({ post, readingTime }: PostProps) {
   console.log(readingTime);
   console.log(post);
 
+  const { isFallback } = useRouter();
+
+  if (isFallback) {
+    return <div>Carregando...</div>;
+  }
+
   return (
     <>
       <Header />
@@ -100,7 +107,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   // TODO
   return {
-    paths: [],
+    paths: [
+      {
+        params: { slug: 'spacex-rocket-debris-creates-a-fantastic-light-show' },
+      },
+    ],
     fallback: true,
   };
 };
