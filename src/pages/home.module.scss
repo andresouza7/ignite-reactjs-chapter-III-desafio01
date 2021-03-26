@@ -1,1 +1,26 @@
 // TODO
+.homeContainer {
+  max-width: 700px;
+
+  .postItem {
+    h1 {
+
+    }
+  
+    p {
+  
+    }
+  
+    time {
+  
+    }
+  
+    span {
+      
+    }
+
+    & + .postItem {
+      margin-top: 3rem;
+    }
+  }
+}
