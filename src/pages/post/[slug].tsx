@@ -5,6 +5,8 @@ import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 import { RichText } from 'prismic-dom';
 import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
 import { useRouter } from 'next/router';
+import { format } from 'date-fns';
+import enUS from 'date-fns/locale/pt-BR';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -22,9 +24,6 @@ interface Post {
     author: string;
     content: {
       heading: string;
-      // bodyTest?: {
-      //   text: string;
-      // };
       body: {
         text: string;
       }[];
@@ -34,9 +33,7 @@ interface Post {
 
 function mapPostContent(responseResults): Post {
   return {
-    first_publication_date: prettifyDate(
-      responseResults.first_publication_date
-    ),
+    first_publication_date: responseResults.first_publication_date,
     data: {
       title: responseResults.data.title,
       banner: {
@@ -46,8 +43,7 @@ function mapPostContent(responseResults): Post {
       content: responseResults.data.content.map(section => {
         return {
           heading: section.heading,
-          body: RichText.asHtml(section.body),
-          // bodyTest: section.body.map(({ text }) => text),
+          body: section.body.map(({ text }) => ({ text })),
         };
       }),
     },
@@ -56,12 +52,10 @@ function mapPostContent(responseResults): Post {
 
 interface PostProps {
   post: Post;
-  readingTime: number;
 }
 
-export default function Post({ post, readingTime }: PostProps) {
+export default function Post({ post }: PostProps) {
   // TODO
-  console.log(readingTime);
   console.log(post);
 
   const { isFallback } = useRouter();
@@ -69,6 +63,13 @@ export default function Post({ post, readingTime }: PostProps) {
   if (isFallback) {
     return <div>Carregando...</div>;
   }
+
+  // get reading time
+  const wordCount = post.data?.content.reduce((acc, item) => {
+    const sectionWordCount = RichText.asText(item.body).split(' ').length;
+    return acc + sectionWordCount;
+  }, 0);
+  const readingTime = Math.ceil(wordCount / 200);
 
   return (
     <>
@@ -84,7 +85,11 @@ export default function Post({ post, readingTime }: PostProps) {
         <div className={styles.postHeadingInfo}>
           <div>
             <FiCalendar />
-            <span>{post?.first_publication_date}</span>
+            <span>
+              {format(new Date(post.first_publication_date), 'dd MMM yyyy', {
+                locale: enUS,
+              })}
+            </span>
           </div>
           <div>
             <FiUser />
@@ -101,7 +106,10 @@ export default function Post({ post, readingTime }: PostProps) {
         {post?.data.content.map(content => (
           <div key={Math.random().toString()} className={styles.postBody}>
             <h2>{content.heading}</h2>
-            <div dangerouslySetInnerHTML={{ __html: String(content.body) }} />
+            {content.body.map(item => (
+              <p key={Math.random().toString()}>{item.text}</p>
+            ))}
+            {/* <div dangerouslySetInnerHTML={{ __html: String(content.body) }} /> */}
           </div>
         ))}
       </main>
@@ -109,7 +117,7 @@ export default function Post({ post, readingTime }: PostProps) {
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths = async () => {
   // const prismic = getPrismicClient();
   // const posts = await prismic.query(TODO);
 
@@ -125,20 +133,13 @@ export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('post', slug, {});
 
-  // get reading time
-  const wordCount = response.data?.content.reduce((acc, item) => {
-    const sectionWordCount = RichText.asText(item.body).split(' ').length;
-    return acc + sectionWordCount;
-  }, 0);
-  const readingTime = Math.ceil(wordCount / 200);
-
   const post = mapPostContent(response);
 
   console.log(post);
 
   // TODO
   return {
-    props: { post, readingTime },
+    props: { post },
     revalidate: 60 * 30, // 30 min
   };
 };

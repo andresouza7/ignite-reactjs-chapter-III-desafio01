@@ -27,13 +27,7 @@ interface Post {
 function mapPostPreview(responseResults): Post {
   return {
     uid: responseResults.uid,
-    first_publication_date: format(
-      new Date(responseResults.first_publication_date),
-      'dd MMM yyyy',
-      {
-        locale: enUS,
-      }
-    ),
+    first_publication_date: responseResults.first_publication_date,
     data: {
       title: responseResults.data.title,
       subtitle: responseResults.data.subtitle,
@@ -85,7 +79,11 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             <p>{post.data.subtitle}</p>
             <time>
               <FiCalendar />
-              <span>{post.first_publication_date}</span>
+              <span>
+                {format(new Date(post.first_publication_date), 'dd MMM yyyy', {
+                  locale: enUS,
+                })}
+              </span>
             </time>
             <span>
               <FiUser />
