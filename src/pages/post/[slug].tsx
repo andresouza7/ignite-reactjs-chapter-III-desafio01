@@ -14,9 +14,11 @@ import styles from './post.module.scss';
 import Header from '../../components/Header';
 
 interface Post {
+  uid: string;
   first_publication_date: string | null;
   data: {
     title: string;
+    subtitle: string;
     banner: {
       url: string;
     };
@@ -30,21 +32,25 @@ interface Post {
   };
 }
 
+// .map(section => {
+//   return {
+//     heading: section.heading,
+//     body: section.body.map(({ text }) => ({ text })),
+//   };
+// })
+
 function mapPostContent(responseResults): Post {
   return {
+    uid: responseResults.uid,
     first_publication_date: responseResults.first_publication_date,
     data: {
       title: responseResults.data.title,
+      subtitle: responseResults.data.subtitle,
       banner: {
         url: responseResults.data.banner.url,
       },
       author: responseResults.data.author,
-      content: responseResults.data.content.map(section => {
-        return {
-          heading: section.heading,
-          body: section.body.map(({ text }) => ({ text })),
-        };
-      }),
+      content: responseResults.data.content,
     },
   };
 }
@@ -146,8 +152,6 @@ export const getStaticProps: GetStaticProps = async context => {
   const response = await prismic.getByUID('post', String(slug), {
     fetch: ['post.title', 'post.banner', 'post.author', 'post.content'],
   });
-
-  console.log(response.data);
 
   const post: Post = mapPostContent(response);
 
