@@ -22,6 +22,9 @@ interface Post {
     author: string;
     content: {
       heading: string;
+      // bodyTest?: {
+      //   text: string;
+      // };
       body: {
         text: string;
       }[];
@@ -29,17 +32,22 @@ interface Post {
   };
 }
 
-function mapPostContent(response: ApiSearchResponse): Post {
+function mapPostContent(responseResults): Post {
   return {
-    first_publication_date: prettifyDate(response.first_publication_date),
+    first_publication_date: prettifyDate(
+      responseResults.first_publication_date
+    ),
     data: {
-      title: response.data.title,
-      banner: response.data.banner.url,
-      author: response.data.author,
-      content: response.data.content.map(section => {
+      title: responseResults.data.title,
+      banner: {
+        url: responseResults.data.banner.url,
+      },
+      author: responseResults.data.author,
+      content: responseResults.data.content.map(section => {
         return {
           heading: section.heading,
           body: RichText.asHtml(section.body),
+          // bodyTest: section.body.map(({ text }) => text),
         };
       }),
     },
@@ -68,7 +76,7 @@ export default function Post({ post, readingTime }: PostProps) {
 
       <div
         className={styles.banner}
-        style={{ backgroundImage: `url(${post?.data.banner})` }}
+        style={{ backgroundImage: `url(${post?.data.banner.url})` }}
       />
 
       <div className={`${commonStyles.container} ${styles.postHeading}`}>
@@ -93,7 +101,7 @@ export default function Post({ post, readingTime }: PostProps) {
         {post?.data.content.map(content => (
           <div key={Math.random().toString()} className={styles.postBody}>
             <h2>{content.heading}</h2>
-            <div dangerouslySetInnerHTML={{ __html: content.body }} />
+            <div dangerouslySetInnerHTML={{ __html: String(content.body) }} />
           </div>
         ))}
       </main>
@@ -107,11 +115,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   // TODO
   return {
-    paths: [
-      {
-        params: { slug: 'spacex-rocket-debris-creates-a-fantastic-light-show' },
-      },
-    ],
+    paths: [],
     fallback: true,
   };
 };
@@ -119,7 +123,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async context => {
   const { slug } = context.params;
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('post', slug);
+  const response = await prismic.getByUID('post', slug, {});
 
   // get reading time
   const wordCount = response.data?.content.reduce((acc, item) => {

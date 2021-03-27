@@ -10,7 +10,7 @@ export function getPrismicClient(req?: unknown): DefaultClient {
   return prismic;
 }
 
-export function getPaginatedPosts(pages = 10): ApiSearchResponse {
+export function getPaginatedPosts(pages = 10) {
   const prismic = getPrismicClient();
   return prismic.query([Prismic.predicates.at('document.type', 'post')], {
     fetch: ['post.title', 'post.subtitle', 'post.author'],

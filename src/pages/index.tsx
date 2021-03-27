@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
 import { useState } from 'react';
+import { format } from 'date-fns';
+import enUS from 'date-fns/locale/pt-BR';
 import { getPaginatedPosts, getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -22,14 +24,20 @@ interface Post {
   };
 }
 
-function mapPostPreview(post: ApiSearchResponse): Post {
+function mapPostPreview(responseResults): Post {
   return {
-    uid: post.uid,
-    first_publication_date: prettifyDate(post.first_publication_date),
+    uid: responseResults.uid,
+    first_publication_date: format(
+      new Date(responseResults.first_publication_date),
+      'dd MMM yyyy',
+      {
+        locale: enUS,
+      }
+    ),
     data: {
-      title: post.data.title,
-      subtitle: post.data.subtitle,
-      author: post.data.author,
+      title: responseResults.data.title,
+      subtitle: responseResults.data.subtitle,
+      author: responseResults.data.author,
     },
   };
 }
@@ -44,7 +52,7 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  const [posts, setPosts] = useState<Posts[]>(postsPagination.results);
+  const [posts, setPosts] = useState<Post[]>(postsPagination.results);
   const [nextPage, setNextPage] = useState<string | null>(
     postsPagination.next_page
   );
@@ -106,27 +114,10 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const posts: Post[] = postsResponse?.results.map(mapPostPreview);
 
-  const postsPagination: PostPagination = {
-    next_page: postsResponse.next_page,
+  const postsPagination = {
+    next_page: postsResponse?.next_page,
     results: posts,
   };
-
-  // const postsPagination = {
-  //   next_page:
-  //     'https://ignite-blog-app.cdn.prismic.io/api/v2/documents/search?ref=YF3tixMAACAAPVi9&q=%5B%5Bat%28document.type%2C+%22post%22%29%5D%5D&page=2&pageSize=1',
-  //   results: [
-  //     {
-  //       uid: 'spacex-rocket-debris-creates-a-fantastic-light-show',
-  //       first_publication_date: prettifyDate('2021-03-26T14:19:55+0000'),
-  //       data: {
-  //         title:
-  //           'SpaceX rocket debris creates a fantastic light show in the Pacific Northwest sky',
-  //         subtitle: 'Not a meteor shower, but space age spoilage',
-  //         author: 'James Vincent',
-  //       },
-  //     },
-  //   ],
-  // };
 
   return {
     props: { postsPagination },
