@@ -3,7 +3,6 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 import { FiUser, FiCalendar, FiClock } from 'react-icons/fi';
 
 import { RichText } from 'prismic-dom';
-import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
 import { useRouter } from 'next/router';
 import { format } from 'date-fns';
 import enUS from 'date-fns/locale/pt-BR';
@@ -13,8 +12,6 @@ import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import Header from '../../components/Header';
-import { prettifyDate } from '../../util/prettifyDate';
-import { getPaginatedPosts } from '../../services/prismic';
 
 interface Post {
   first_publication_date: string | null;
@@ -58,8 +55,6 @@ interface PostProps {
 
 export default function Post({ post }: PostProps) {
   // TODO
-  console.log(post);
-
   const { isFallback } = useRouter();
 
   if (isFallback) {
@@ -119,16 +114,14 @@ export default function Post({ post }: PostProps) {
   );
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'post')],
     {
-      fetch: ['post.title', 'post.subtitle', 'post.author'],
+      fetch: ['post.title', 'post.banner', 'post.author', 'post.content'],
     }
   );
-
-  // console.log(response);
 
   const paths = response?.results.map(result => {
     return {
@@ -152,7 +145,9 @@ export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('post', slug, {});
 
-  const post = mapPostContent(response);
+  console.log(response.data);
+
+  const post: Post = mapPostContent(response);
 
   // TODO
   return {

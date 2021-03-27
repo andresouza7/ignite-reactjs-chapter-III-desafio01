@@ -7,12 +7,11 @@ import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import enUS from 'date-fns/locale/pt-BR';
-import { getPaginatedPosts, getPrismicClient } from '../services/prismic';
+import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import Header from '../components/Header';
-import { prettifyDate } from '../util/prettifyDate';
 
 interface Post {
   uid?: string;
@@ -112,6 +111,7 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'post')],
     {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
+      pageSize: 1,
     }
   );
 
