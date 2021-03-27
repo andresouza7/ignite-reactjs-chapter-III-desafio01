@@ -53,7 +53,7 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post }: PostProps): JSX.Element {
   // TODO
   const { isFallback } = useRouter();
 
@@ -131,7 +131,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     };
   });
 
-  console.log(paths);
+  // console.log(paths);
 
   // TODO
   return {
@@ -143,7 +143,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async context => {
   const { slug } = context.params;
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('post', slug, {});
+  const response = await prismic.getByUID('post', String(slug), {
+    fetch: ['post.title', 'post.banner', 'post.author', 'post.content'],
+  });
 
   console.log(response.data);
 

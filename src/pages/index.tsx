@@ -50,17 +50,12 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
     postsPagination.next_page
   );
   // TODO
-  console.log(postsPagination);
-  // postsPagination.next_page = true;
-  // postsPagination.results = Array(5).fill(postsPagination.results[0]);
 
   async function handleLoadMorePosts() {
     const response = await fetch(postsPagination.next_page);
     const responseData: ApiSearchResponse = await response.json();
 
     const postsLoaded = responseData.results.map(mapPostPreview);
-
-    console.log(postsLoaded);
 
     setNextPage(responseData.next_page);
     setPosts([...posts, ...postsLoaded]);
@@ -122,7 +117,7 @@ export const getStaticProps: GetStaticProps = async () => {
     results: posts,
   };
 
-  console.log(postsPagination);
+  // console.log(postsPagination);
 
   return {
     props: { postsPagination },
