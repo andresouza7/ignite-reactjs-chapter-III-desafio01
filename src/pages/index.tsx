@@ -108,14 +108,21 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
 
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
-  const postsResponse = await getPaginatedPosts(1);
+  const postsResponse = await prismic.query(
+    [Prismic.predicates.at('document.type', 'post')],
+    {
+      fetch: ['post.title', 'post.subtitle', 'post.author'],
+    }
+  );
 
-  const posts: Post[] = postsResponse?.results.map(mapPostPreview);
+  const posts: Post[] = postsResponse.results.map(mapPostPreview);
 
   const postsPagination = {
-    next_page: postsResponse?.next_page,
+    next_page: postsResponse.next_page,
     results: posts,
   };
+
+  console.log(postsPagination);
 
   return {
     props: { postsPagination },

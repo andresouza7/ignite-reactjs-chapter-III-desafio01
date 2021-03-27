@@ -7,12 +7,14 @@ import ApiSearchResponse from '@prismicio/client/types/ApiSearchResponse';
 import { useRouter } from 'next/router';
 import { format } from 'date-fns';
 import enUS from 'date-fns/locale/pt-BR';
+import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import Header from '../../components/Header';
 import { prettifyDate } from '../../util/prettifyDate';
+import { getPaginatedPosts } from '../../services/prismic';
 
 interface Post {
   first_publication_date: string | null;
@@ -118,12 +120,29 @@ export default function Post({ post }: PostProps) {
 }
 
 export const getStaticPaths = async () => {
-  // const prismic = getPrismicClient();
-  // const posts = await prismic.query(TODO);
+  const prismic = getPrismicClient();
+  const response = await prismic.query(
+    [Prismic.predicates.at('document.type', 'post')],
+    {
+      fetch: ['post.title', 'post.subtitle', 'post.author'],
+    }
+  );
+
+  // console.log(response);
+
+  const paths = response?.results.map(result => {
+    return {
+      params: {
+        slug: result.uid,
+      },
+    };
+  });
+
+  console.log(paths);
 
   // TODO
   return {
-    paths: [],
+    paths,
     fallback: true,
   };
 };
@@ -134,8 +153,6 @@ export const getStaticProps: GetStaticProps = async context => {
   const response = await prismic.getByUID('post', slug, {});
 
   const post = mapPostContent(response);
-
-  console.log(post);
 
   // TODO
   return {
