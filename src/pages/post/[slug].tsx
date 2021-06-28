@@ -18,7 +18,7 @@ interface Post {
   first_publication_date: string | null;
   data: {
     title: string;
-    subtitle: string;
+    // subtitle: string;
     banner: {
       url: string;
     };
@@ -45,7 +45,7 @@ function mapPostContent(responseResults): Post {
     first_publication_date: responseResults.first_publication_date,
     data: {
       title: responseResults.data.title,
-      subtitle: responseResults.data.subtitle,
+      // subtitle: responseResults.data.subtitle,
       banner: {
         url: responseResults.data.banner.url,
       },
@@ -125,7 +125,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'post')],
     {
-      fetch: ['post.title', 'post.banner', 'post.author', 'post.content'],
+      fetch: [
+        'post.title',
+        // 'post.subtitle',
+        'post.banner',
+        'post.author',
+        'post.content',
+      ],
     }
   );
 
